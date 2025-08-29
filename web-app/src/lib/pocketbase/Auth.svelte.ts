@@ -1,4 +1,4 @@
-import { pb } from '../lib/Pocketbase.ts';
+import { pb } from './Pocketbase.ts';
 import { setContext,getContext } from "svelte";
 
 const AUTH_STORE_KEY = import.meta.env.PB_AUTH_KEY
