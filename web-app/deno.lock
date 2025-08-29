@@ -3,6 +3,7 @@
   "specifiers": {
     "npm:@deno/vite-plugin@^1.0.5": "1.0.5_vite@7.1.3__picomatch@4.0.3",
     "npm:@sveltejs/vite-plugin-svelte@^6.1.0": "6.1.3_svelte@5.38.3__acorn@8.15.0_vite@7.1.3__picomatch@4.0.3",
+    "npm:pocketbase@~0.26.2": "0.26.2",
     "npm:svelte@^5.37.3": "5.38.3_acorn@8.15.0",
     "npm:vite@*": "7.1.3_picomatch@4.0.3",
     "npm:vite@^7.0.6": "7.1.3_picomatch@4.0.3"
@@ -411,6 +412,9 @@
     "picomatch@4.0.3": {
       "integrity": "sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q=="
     },
+    "pocketbase@0.26.2": {
+      "integrity": "sha512-WA8EOBc3QnSJh8rJ3iYoi9DmmPOMFIgVfAmIGux7wwruUEIzXgvrO4u0W2htfQjGIcyezJkdZOy5Xmh7SxAftw=="
+    },
     "postcss@8.5.6": {
       "integrity": "sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==",
       "dependencies": [
@@ -510,6 +514,7 @@
     "dependencies": [
       "npm:@deno/vite-plugin@^1.0.5",
       "npm:@sveltejs/vite-plugin-svelte@^6.1.0",
+      "npm:pocketbase@~0.26.2",
       "npm:svelte@^5.37.3",
       "npm:vite@^7.0.6"
     ]
