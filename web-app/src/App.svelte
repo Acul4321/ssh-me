@@ -6,25 +6,49 @@
 
   const auth : AuthStore = set_auth_context();
 
+  // Form Inputs structure
   interface InputInfo {
     label: string;
+    field: string;
     type: string;
     value: any;
   }
 
   let formInputs: InputInfo[] = $state([
-    { label: "Handle", type: "text", value: "" },
-    { label: "Status", type: "text", value: "" },
-    { label: "Colour", type: "color", value: "#000000" }
+    { label: "Handle", field: "username", type: "text", value: "" },
+    { label: "Status", field: "status", type: "text", value: "" },
+    { label: "Colour", field: "colour", type: "color", value: "#000000" }
   ]);
 
+  // for popuating the input fields with user information
+  $effect(() => {
+    if (auth.user) {
+      formInputs.forEach(input => {
+        if (auth.user[input.field] !== undefined) {
+          input.value = auth.user[input.field];
+        }
+      });
+    }
+  });
+
+  // variable storing the profile information in the forms
   let profileState = $derived(formInputs.reduce((acc, input) => {
     acc[input.label.toLowerCase()] = input.value;
     return acc;
   }, {} as Record<string, any>));
 
-  function handleSubmit() {
-    console.log("form submit");
+  // for updating the user in the db with profileState TODO: move db functions into seperate file
+  async function update_user_fields() {
+    console.log(profileState);
+    const userId = pb.authStore.record?.id;
+    if (!userId) return;
+
+    try {
+      await pb.collection('users').update(userId, profileState);
+      console.log("profile Successfully updated");
+    } catch (err) {
+      console.error("Failed to update profile: ", err);
+    }
   }
 </script>
 
@@ -39,7 +63,7 @@
     <button onclick={auth.logout}>Sign out</button>
 
     <!-- Profile Form -->
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={update_user_fields}>
       {#each formInputs as input}
         <FormInput
           label={input.label}
