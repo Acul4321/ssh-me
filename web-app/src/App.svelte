@@ -33,7 +33,7 @@
 
   // variable storing the profile information in the forms
   let profileState = $derived(formInputs.reduce((acc, input) => {
-    acc[input.label.toLowerCase()] = input.value;
+    acc[input.field] = input.value;
     return acc;
   }, {} as Record<string, any>));
 
