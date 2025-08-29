@@ -3,18 +3,26 @@ import { setContext,getContext } from "svelte";
 
 const AUTH_STORE_KEY = import.meta.env.PB_AUTH_KEY
 
-export class AuthStore {
+class AuthStore {
     user: typeof pb.authStore.record | null = $state(null);
     isSynced : boolean = $state(false);
 
     constructor() {
         // runs on mount
         $effect(() => {
-            if(pb.authStore.isValid){
-                this.user = pb.authStore.record;
-            }
+            // subscribe to auth Store changes
+            const unsubscribe = pb.authStore.onChange((token, model) => {
+                this.user = model;
+            }, true);
+
             this.isSynced = true;
+            
+            // for clean-up when destroyed
+            return () => {
+                unsubscribe();
+            };
         });
+        
     }
 
     async sign_in_with_google(){
@@ -28,12 +36,14 @@ export class AuthStore {
     }
 }
 
+export { AuthStore };
+
 // important if u are gonna have any SSR to prevent leakage to multiple users
 export function set_auth_context() {
     const newAuthStore = new AuthStore();
-    return  setContext(AUTH_STORE_KEY, newAuthStore);
+    return setContext(AUTH_STORE_KEY, newAuthStore);
 }
 
-export function get_auth_context() {
+export function get_auth_context() : AuthStore {
     return getContext(AUTH_STORE_KEY);
 }

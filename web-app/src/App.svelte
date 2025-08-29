@@ -1,8 +1,9 @@
 <script lang="ts">
   import { pb } from './lib/Pocketbase'
-  import { set_auth_context } from './lib/Auth.svelte'
+  import { AuthStore, set_auth_context } from './lib/Auth.svelte'
 
-  const auth = set_auth_context();
+  let auth : AuthStore = set_auth_context();
+
 </script>
 
 <main>
