@@ -4,7 +4,7 @@
   import Form from './lib/components/form/UserForm.svelte'
   import FormInput from './lib/components/form/FormInput.svelte';
   import Toaster from './lib/components/toast/Toaster.svelte';
-    import { add_toast, toastTypes } from './lib/components/toast/Toast';
+  import { add_toast, toastTypes } from './lib/components/toast/Toast';
 
   const auth : AuthStore = set_auth_context();
 
@@ -53,6 +53,8 @@
       console.error("Failed to update profile: ", err);
     }
   }
+
+  let sshLine : string = $derived(auth.user?.username ? `ssh ${auth.user.username}@ssh-me.com` : '');
 </script>
 
 <Toaster />
@@ -77,6 +79,15 @@
         />
       {/each}
     </Form>
+
+    <!-- dynamic ssh link -->
+    <div>
+      <p>{sshLine}</p>
+      <button onclick={() => {
+        navigator.clipboard.writeText(sshLine);
+        add_toast("Copied",toastTypes.SUCCESS)
+      }}>Copy</button>
+    </div>
 
   {:else} 
     <button onclick={auth.sign_in_with_google}> Continue with Google </button>
