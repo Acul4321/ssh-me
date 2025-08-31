@@ -56,7 +56,6 @@
 </script>
 
 <Toaster />
-<button onclick={() => add_toast("hello World", toastTypes.SUCCESS, 3000)}>toast</button>
 
 <header>
   <h1>ssh-me</h1>

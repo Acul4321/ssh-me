@@ -10,7 +10,6 @@
             <Toast
                 message = {toast.message}
                 type = {toast.type}
-                dismissible = {toast.dismissible}
             />
         {/each}
     </section>

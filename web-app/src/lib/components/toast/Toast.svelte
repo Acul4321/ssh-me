@@ -1,21 +1,14 @@
 <script lang="ts">
-    import { toastTypes } from './Toast';
+    import { toastTypes, delete_toast } from './Toast';
 
     let {
         message,
-        type,
-        dismissible = true,
-    }: { message: string; type : toastTypes; dismissible? : boolean } = $props();
+        type
+    }: { message: string; type : toastTypes} = $props();
 </script>
 
 <output class="toast" data-type="{type}">
     <div>
         {message}
     </div>
-
-    {#if dismissible}
-    <button class="close" onclick={() => console.log("delete toast")}>
-        close
-    </button>
-    {/if}
 </output>

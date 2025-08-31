@@ -9,10 +9,9 @@ export interface ToastInfo {
     message : string;
     type : toastTypes;
     duration?: number;
-    dismissible? : boolean;
 }
 
-export function add_toast(message : string, type : toastTypes, duration : number = 1000, dismissible : boolean = true){
+export function add_toast(message : string, type : toastTypes, duration : number = 1000){
     // id for easily finding the toast
     const id = (Math.random() * 10000);
 
@@ -20,8 +19,7 @@ export function add_toast(message : string, type : toastTypes, duration : number
         id,
         message,
         type,
-        duration,
-        dismissible
+        duration
     };
 
     // add new toast
