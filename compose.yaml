@@ -1,0 +1,25 @@
+services:
+  terminal-app:
+    build: 
+      context: ./terminal-app
+    image: terminal-app
+    env_file:
+      - ./.env
+    ports:
+      - "22:22"
+    depends_on:
+      - pocketbase-db
+  pocketbase-db:
+    build:
+      context: ./pocketbase
+    image: pocketbase-db
+    environment:
+      - POCKETBASE_ADMIN_EMAIL=test@gmail.com
+      - POCKETBASE_ADMIN_PASSWORD=Password
+    ports:
+      - "8080:8080"
+    volumes:
+      - pocketbase-db_data:/pocketbase/pb_data
+
+volumes:
+  pocketbase-db_data:
