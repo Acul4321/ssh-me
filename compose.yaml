@@ -6,34 +6,41 @@ services:
     ports:
       - "8001:8000"
     depends_on:
-      - pocketbase-db
+      pocketbase-db:
+        condition: service_healthy
+    restart: unless-stopped
 
   terminal-app:
     build: 
       context: ./terminal-app
     image: terminal-app
-    # env_file:
-    #   - ./.env
+    env_file:
+      - ./.env
     environment:
       - PB_BASE_URL=http://pocketbase-db:8080
-      - PB_ADMIN_EMAIL=test@gmail.com
-      - PB_ADMIN_PASSWORD=Password
     ports:
       - "22:22"
     depends_on:
-      - pocketbase-db
+      pocketbase-db:
+        condition: service_healthy
+    restart: unless-stopped
 
   pocketbase-db:
     build:
       context: ./pocketbase
     image: pocketbase-db
-    environment:
-      - POCKETBASE_ADMIN_EMAIL=test@gmail.com
-      - POCKETBASE_ADMIN_PASSWORD=Password
+    env_file:
+      - ./.env
     ports:
       - "8080:8080"
     volumes:
       - ./pocketbase/pb_data:/pocketbase/pb_data
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/api/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
 volumes:
   pocketbase-db_data:
