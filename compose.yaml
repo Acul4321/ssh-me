@@ -1,4 +1,13 @@
 services:
+  web-app:
+    build:
+      context: ./web-app
+    image: web-app
+    ports:
+      - "8001:8000"
+    depends_on:
+      - pocketbase-db
+
   terminal-app:
     build: 
       context: ./terminal-app
@@ -13,6 +22,7 @@ services:
       - "22:22"
     depends_on:
       - pocketbase-db
+
   pocketbase-db:
     build:
       context: ./pocketbase
