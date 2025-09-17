@@ -3,8 +3,12 @@ services:
     build: 
       context: ./terminal-app
     image: terminal-app
-    env_file:
-      - ./.env
+    # env_file:
+    #   - ./.env
+    environment:
+      - PB_BASE_URL=http://pocketbase-db:8080
+      - PB_ADMIN_EMAIL=test@gmail.com
+      - PB_ADMIN_PASSWORD=Password
     ports:
       - "22:22"
     depends_on:
@@ -19,7 +23,8 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - pocketbase-db_data:/pocketbase/pb_data
+      - ./pocketbase/pb_data:/pocketbase/pb_data
 
 volumes:
   pocketbase-db_data:
+    name: pocketbase-db_data
