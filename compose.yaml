@@ -11,7 +11,7 @@ services:
     restart: unless-stopped
 
   terminal-app:
-    build: 
+    build:
       context: ./terminal-app
     image: terminal-app
     env_file:
@@ -20,6 +20,8 @@ services:
       - PB_BASE_URL=http://pocketbase-db:8080
     ports:
       - "22:22"
+    volumes:
+      - ./.ssh:/app/.ssh:ro
     depends_on:
       pocketbase-db:
         condition: service_healthy
