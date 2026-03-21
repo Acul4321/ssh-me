@@ -14,8 +14,6 @@ services:
     build:
       context: ./terminal-app
     image: terminal-app
-    env_file:
-      - ./.env
     environment:
       - PB_BASE_URL=http://pocketbase-db:8080
     ports:

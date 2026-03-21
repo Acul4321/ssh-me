@@ -10,5 +10,5 @@ type model struct {
 	bg        string
 	txtStyle  lipgloss.Style
 	quitStyle lipgloss.Style
-	user      *User
+	user      *Profile
 }

@@ -1,33 +1,48 @@
 import { pb } from './Pocketbase.ts';
-import { setContext,getContext } from "svelte";
+import { setContext, getContext } from "svelte";
 
 const AUTH_STORE_KEY = import.meta.env.PB_AUTH_KEY
 
 class AuthStore {
-    user: typeof pb.authStore.record | null = $state(null);
-    isSynced : boolean = $state(false);
+    user: Record<string, any> | null = $state(null);
+    isSynced: boolean = $state(false);
 
     constructor() {
-        // runs on mount
         $effect(() => {
-            // subscribe to auth Store changes
-            const unsubscribe = pb.authStore.onChange((token, model) => {
-                this.user = model;
+            const unsubscribe = pb.authStore.onChange(async () => {
+                if (pb.authStore.isValid && pb.authStore.record) {
+                    this.user = await this.fetchOrCreateProfile(pb.authStore.record.id)
+                } else {
+                    this.user = null
+                }
             }, true);
 
             this.isSynced = true;
-            
-            // for clean-up when destroyed
+
             return () => {
                 unsubscribe();
             };
         });
-        
     }
 
-    async sign_in_with_google(){
-        const authData = await pb.collection('users').authWithOAuth2({ provider: 'google' });
-        this.user = await pb.collection('users').getOne(authData.record.id, { fields: 'id,username,status,colour' });
+    private async fetchOrCreateProfile(userId: string): Promise<Record<string, any> | null> {
+        try {
+            const result = await pb.collection('profiles').getList(1, 1, {
+                filter: `user = "${userId}"`
+            })
+            if (result.totalItems > 0) {
+                return result.items[0]
+            }
+            return await pb.collection('profiles').create({ user: userId })
+        } catch (err) {
+            console.error("Failed to fetch/create profile:", err)
+            return null
+        }
+    }
+
+    async sign_in_with_google() {
+        await pb.collection('users').authWithOAuth2({ provider: 'google' });
+        // profile is loaded by the authStore onChange listener above
     }
 
     logout() {
@@ -38,12 +53,11 @@ class AuthStore {
 
 export { AuthStore };
 
-// important if u are gonna have any SSR to prevent leakage to multiple users
 export function set_auth_context() {
     const newAuthStore = new AuthStore();
     return setContext(AUTH_STORE_KEY, newAuthStore);
 }
 
-export function get_auth_context() : AuthStore {
+export function get_auth_context(): AuthStore {
     return getContext(AUTH_STORE_KEY);
 }

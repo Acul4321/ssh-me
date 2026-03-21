@@ -16,9 +16,9 @@ func teaHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 	// This should never fail, as we are using the activeterm middleware.
 	pty, _, _ := s.Pty()
 
-	var user *User
+	var user *Profile
 	if v := s.Context().Value(userCtxKey); v != nil {
-		if u, ok := v.(*User); ok {
+		if u, ok := v.(*Profile); ok {
 			user = u
 		}
 	}

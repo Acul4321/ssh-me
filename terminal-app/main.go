@@ -20,7 +20,7 @@ import (
 	"github.com/muesli/termenv"
 )
 
-const userCtxKey = "pbUser"
+const userCtxKey = "pbProfile"
 
 const (
 	host = "0.0.0.0"
@@ -30,29 +30,17 @@ const (
 func userLookupMiddleware(next ssh.Handler) ssh.Handler {
 	return func(sess ssh.Session) {
 		username := sess.User()
-		user, err := GetUserByUsername(
-			os.Getenv("PB_BASE_URL"),
-			os.Getenv("PB_ADMIN_EMAIL"),
-			os.Getenv("PB_ADMIN_PASSWORD"),
-			username,
-		)
+		profile, err := GetProfileByUsername(os.Getenv("PB_BASE_URL"), username)
 		if err != nil {
 			log.Warn("PB lookup failed", "user", username, "err", err)
 		} else {
-			sess.Context().SetValue(userCtxKey, user)
+			sess.Context().SetValue(userCtxKey, profile)
 		}
 		next(sess)
 	}
 }
 
 func main() {
-	// Check if environment variables are set
-	if os.Getenv("PB_ADMIN_EMAIL") == "" {
-		log.Fatal("PB_ADMIN_EMAIL environment variable not set")
-	}
-	if os.Getenv("PB_ADMIN_PASSWORD") == "" {
-		log.Fatal("PB_ADMIN_PASSWORD environment variable not set")
-	}
 	if os.Getenv("PB_BASE_URL") == "" {
 		log.Fatal("PB_BASE_URL environment variable not set")
 	}

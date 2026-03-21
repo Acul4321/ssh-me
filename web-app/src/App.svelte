@@ -40,15 +40,13 @@
     return acc;
   }, {} as Record<string, any>));
 
-  // for updating the user in the db with profileState TODO: move db functions into seperate file
+  // for updating the profile in the db with profileState
   async function update_user_fields() {
-    console.log(profileState);
-    const userId = pb.authStore.record?.id;
-    if (!userId) return;
+    const profileId = auth.user?.id;
+    if (!profileId) return;
 
     try {
-      await pb.collection('users').update(userId, profileState);
-      console.log("profile Successfully updated");
+      await pb.collection('profiles').update(profileId, profileState);
     } catch (err) {
       console.error("Failed to update profile: ", err);
     }
