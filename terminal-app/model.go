@@ -7,8 +7,9 @@ type model struct {
 	profile   string
 	width     int
 	height    int
-	bg        string
+	renderer  *lipgloss.Renderer
 	txtStyle  lipgloss.Style
 	quitStyle lipgloss.Style
 	user      *Profile
+	links     []Link
 }

@@ -1,6 +1,8 @@
 /// <reference path="../pb_data/types.d.ts" />
 
 onBootstrap((e) => {
+  e.next()
+
   // --- Google OAuth2 ---
   const googleClientId = $os.getenv("GOOGLE_OAUTH_CLIENT_ID")
   const googleClientSecret = $os.getenv("GOOGLE_OAUTH_CLIENT_SECRET")
@@ -31,6 +33,4 @@ onBootstrap((e) => {
   } else {
     console.log("[auto_setup] GOOGLE_OAUTH_CLIENT_ID/SECRET not set, skipping OAuth config")
   }
-
-  e.next()
 })

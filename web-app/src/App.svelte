@@ -3,12 +3,12 @@
   import { AuthStore, set_auth_context } from './lib/pocketbase/Auth.svelte'
   import Form from './lib/components/form/UserForm.svelte'
   import FormInput from './lib/components/form/FormInput.svelte';
+  import LinksManager from './lib/components/links/LinksManager.svelte';
   import Toaster from './lib/components/toast/Toaster.svelte';
   import { add_toast, toastTypes } from './lib/components/toast/Toast';
 
   const auth : AuthStore = set_auth_context();
 
-  // Form Inputs structure
   interface InputInfo {
     label: string;
     field: string;
@@ -17,13 +17,16 @@
   }
 
   let formInputs: InputInfo[] = $state([
-    { label: "Handle", field: "username", type: "text", value: "" },
-    { label: "Status", field: "status", type: "text", value: "" },
-    { label: "Colour", field: "colour", type: "color", value: "#000000" },
-    { label: "LinkedIn", field: "linkedin", type: "url", value: "" }
+    { label: "Handle",        field: "username",      type: "text",   value: "" },
+    { label: "Display Name",  field: "display_name",  type: "text",   value: "" },
+    { label: "Status",        field: "status",        type: "text",   value: "" },
+    { label: "Bio",           field: "bio",           type: "text",   value: "" },
+    { label: "Pronouns",      field: "pronouns",      type: "text",   value: "" },
+    { label: "Location",      field: "location",      type: "text",   value: "" },
+    { label: "Colour",        field: "colour",        type: "color",  value: "#000000" },
+    { label: "Accent Colour", field: "accent_colour", type: "color",  value: "#000000" },
   ]);
 
-  // for popuating the input fields with user information
   $effect(() => {
     if (auth.user) {
       formInputs.forEach(input => {
@@ -34,21 +37,35 @@
     }
   });
 
-  // variable storing the profile information in the forms
-  let profileState = $derived(formInputs.reduce((acc, input) => {
-    acc[input.field] = input.value;
-    return acc;
-  }, {} as Record<string, any>));
+  let layout = $state('full');
 
-  // for updating the profile in the db with profileState
+  $effect(() => {
+    if (auth.user?.layout) layout = auth.user.layout;
+  });
+
+  let profileState = $derived({
+    ...formInputs.reduce((acc, input) => {
+      acc[input.field] = input.value;
+      return acc;
+    }, {} as Record<string, any>),
+    layout,
+  });
+
   async function update_user_fields() {
     const profileId = auth.user?.id;
     if (!profileId) return;
 
     try {
       await pb.collection('profiles').update(profileId, profileState);
-    } catch (err) {
-      console.error("Failed to update profile: ", err);
+      add_toast("Saved", toastTypes.SUCCESS);
+    } catch (err: any) {
+      const usernameError = err?.data?.data?.username;
+      if (usernameError) {
+        add_toast("That handle is already taken", toastTypes.ERROR);
+      } else {
+        console.error("Failed to update profile: ", err);
+        add_toast("Failed to save", toastTypes.ERROR);
+      }
     }
   }
 
@@ -59,15 +76,14 @@
 
 <header>
   <h1>ssh-me</h1>
-  <p>SSH profiles for "humans"</p>
+  <p>SSH profiles for humans</p>
 </header>
 
 <main>
   {#if auth.user}
-    <p>Signed in as {auth.user.username}</p>
+    <p>Signed in as {auth.user.username || auth.user.id}</p>
     <button onclick={auth.logout}>Sign out</button>
 
-    <!-- Profile Form -->
     <Form onSubmit={update_user_fields}>
       {#each formInputs as input}
         <FormInput
@@ -76,19 +92,30 @@
           bind:value={input.value}
         />
       {/each}
+      <div>
+        <label for="layout">Terminal Layout</label>
+        <select id="layout" bind:value={layout}>
+          <option value="full">Full</option>
+          <option value="compact">Compact</option>
+          <option value="minimal">Minimal</option>
+        </select>
+      </div>
     </Form>
 
-    <!-- dynamic ssh link -->
-    <div>
-      <p>{sshLine}</p>
-      <button onclick={() => {
-        navigator.clipboard.writeText(sshLine);
-        add_toast("Copied",toastTypes.SUCCESS)
-      }}>Copy</button>
-    </div>
+    <LinksManager profileId={auth.user.id} />
 
-  {:else} 
-    <button onclick={auth.sign_in_with_google}> Continue with Google </button>
+    {#if sshLine}
+      <div>
+        <p>{sshLine}</p>
+        <button onclick={() => {
+          navigator.clipboard.writeText(sshLine);
+          add_toast("Copied", toastTypes.SUCCESS)
+        }}>Copy</button>
+      </div>
+    {/if}
+
+  {:else}
+    <button onclick={auth.sign_in_with_google}>Continue with Google</button>
   {/if}
 </main>
 

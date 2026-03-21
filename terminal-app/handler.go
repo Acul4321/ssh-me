@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/ssh"
@@ -23,6 +25,13 @@ func teaHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 		}
 	}
 
+	var links []Link
+	if user != nil {
+		if l, err := GetLinksByProfileId(os.Getenv("PB_BASE_URL"), user.Id); err == nil {
+			links = l
+		}
+	}
+
 	// Ripped from docs:
 	// When running a Bubble Tea app over SSH, you shouldn't use the default
 	// lipgloss.NewStyle function.
@@ -37,20 +46,16 @@ func teaHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 	txtStyle := renderer.NewStyle().Foreground(lipgloss.Color("10"))
 	quitStyle := renderer.NewStyle().Foreground(lipgloss.Color("8"))
 
-	bg := "light"
-	if renderer.HasDarkBackground() {
-		bg = "dark"
-	}
-
 	m := model{
 		term:      pty.Term,
 		profile:   renderer.ColorProfile().Name(),
 		width:     pty.Window.Width,
 		height:    pty.Window.Height,
-		bg:        bg,
+		renderer:  renderer,
 		txtStyle:  txtStyle,
 		quitStyle: quitStyle,
 		user:      user,
+		links:     links,
 	}
 
 	return m, []tea.ProgramOption{tea.WithAltScreen()}

@@ -25,7 +25,7 @@ class AuthStore {
         });
     }
 
-    private async fetchOrCreateProfile(userId: string): Promise<Record<string, any> | null> {
+    private async fetchOrCreateProfile(userId: string, avatarUrl?: string): Promise<Record<string, any> | null> {
         try {
             const result = await pb.collection('profiles').getList(1, 1, {
                 filter: `user = "${userId}"`
@@ -33,7 +33,7 @@ class AuthStore {
             if (result.totalItems > 0) {
                 return result.items[0]
             }
-            return await pb.collection('profiles').create({ user: userId })
+            return await pb.collection('profiles').create({ user: userId, avatar_url: avatarUrl ?? '' })
         } catch (err) {
             console.error("Failed to fetch/create profile:", err)
             return null
@@ -41,8 +41,11 @@ class AuthStore {
     }
 
     async sign_in_with_google() {
-        await pb.collection('users').authWithOAuth2({ provider: 'google' });
-        // profile is loaded by the authStore onChange listener above
+        const result = await pb.collection('users').authWithOAuth2({ provider: 'google' });
+        const avatarUrl = result.meta?.avatarUrl ?? '';
+        if (result.record) {
+            this.user = await this.fetchOrCreateProfile(result.record.id, avatarUrl);
+        }
     }
 
     logout() {
