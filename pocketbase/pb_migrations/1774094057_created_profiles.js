@@ -171,7 +171,8 @@ migrate((app) => {
     ],
     "id": "pbc_3414089001",
     "indexes": [
-      "CREATE UNIQUE INDEX idx_profiles_username ON profiles (username) WHERE username != ''"
+      "CREATE UNIQUE INDEX idx_profiles_username ON profiles (username) WHERE username != ''",
+      "CREATE UNIQUE INDEX idx_profiles_user ON profiles (user)"
     ],
     "listRule": "",
     "name": "profiles",
