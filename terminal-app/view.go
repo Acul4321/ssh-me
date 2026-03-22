@@ -73,7 +73,11 @@ func (m model) View() string {
 	if m.user.DisplayName != "" {
 		name = m.user.DisplayName
 	}
-	lines = append(lines, r.NewStyle().Bold(true).Render(name))
+	nameStyle := r.NewStyle().Bold(true)
+	if m.user.AccentColour != "" {
+		nameStyle = nameStyle.Foreground(lipgloss.Color(m.user.AccentColour))
+	}
+	lines = append(lines, nameStyle.Render(name))
 
 	// --- Meta (full only) ---
 	if layout == "full" {
@@ -111,8 +115,14 @@ func (m model) View() string {
 
 	// --- Links ---
 	if len(m.links) > 0 {
-		lines = append(lines, r.NewStyle().Bold(true).MarginTop(1).Render("Links"))
-		lines = append(lines, r.NewStyle().Faint(true).Render("─────"))
+		accentStyle := r.NewStyle().Bold(true).MarginTop(1)
+		dividerStyle := r.NewStyle().Faint(true)
+		if m.user.AccentColour != "" {
+			accentStyle = accentStyle.Foreground(lipgloss.Color(m.user.AccentColour))
+			dividerStyle = dividerStyle.Foreground(lipgloss.Color(m.user.AccentColour))
+		}
+		lines = append(lines, accentStyle.Render("Links"))
+		lines = append(lines, dividerStyle.Render("─────"))
 
 		maxLabelLen := 0
 		for _, link := range m.links {
