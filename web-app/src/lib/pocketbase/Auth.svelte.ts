@@ -1,7 +1,7 @@
 import { pb } from './Pocketbase.ts';
 import { setContext, getContext } from "svelte";
 
-const AUTH_STORE_KEY = import.meta.env.PB_AUTH_KEY
+const AUTH_STORE_KEY = "auth"
 
 class AuthStore {
     user: Record<string, any> | null = $state(null);
@@ -11,7 +11,9 @@ class AuthStore {
         $effect(() => {
             const unsubscribe = pb.authStore.onChange(async () => {
                 if (pb.authStore.isValid && pb.authStore.record) {
-                    this.user = await this.fetchOrCreateProfile(pb.authStore.record.id)
+                    const record = pb.authStore.record;
+                    const avatarUrl = record.avatarUrl ?? record.avatar ?? '';
+                    this.user = await this.fetchOrCreateProfile(record.id, avatarUrl)
                 } else {
                     this.user = null
                 }
@@ -33,7 +35,16 @@ class AuthStore {
             if (result.totalItems > 0) {
                 return result.items[0]
             }
-            return await pb.collection('profiles').create({ user: userId, avatar_url: avatarUrl ?? '' })
+            try {
+                return await pb.collection('profiles').create({ user: userId, avatar_url: avatarUrl ?? '' })
+            } catch {
+                // creation failed (likely a race condition hitting the unique constraint)
+                // fall back to fetching the profile that the other call created
+                const retry = await pb.collection('profiles').getList(1, 1, {
+                    filter: `user = "${userId}"`
+                })
+                return retry.items[0] ?? null
+            }
         } catch (err) {
             console.error("Failed to fetch/create profile:", err)
             return null
@@ -41,11 +52,8 @@ class AuthStore {
     }
 
     async sign_in_with_google() {
-        const result = await pb.collection('users').authWithOAuth2({ provider: 'google' });
-        const avatarUrl = result.meta?.avatarUrl ?? '';
-        if (result.record) {
-            this.user = await this.fetchOrCreateProfile(result.record.id, avatarUrl);
-        }
+        await pb.collection('users').authWithOAuth2({ provider: 'google' });
+        // profile is created/fetched by the authStore onChange listener above
     }
 
     logout() {
