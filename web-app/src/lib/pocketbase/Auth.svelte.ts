@@ -30,7 +30,7 @@ class AuthStore {
     private async fetchOrCreateProfile(userId: string, avatarUrl?: string): Promise<Record<string, any> | null> {
         try {
             const result = await pb.collection('profiles').getList(1, 1, {
-                filter: `user = "${userId}"`
+                filter: pb.filter('user = {:id}', { id: userId })
             })
             if (result.totalItems > 0) {
                 return result.items[0]
@@ -41,7 +41,7 @@ class AuthStore {
                 // creation failed (likely a race condition hitting the unique constraint)
                 // fall back to fetching the profile that the other call created
                 const retry = await pb.collection('profiles').getList(1, 1, {
-                    filter: `user = "${userId}"`
+                    filter: pb.filter('user = {:id}', { id: userId })
                 })
                 return retry.items[0] ?? null
             }
