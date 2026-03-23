@@ -14,15 +14,16 @@
     field: string;
     type: string;
     value: any;
+    placeholder?: string;
   }
 
   let formInputs: InputInfo[] = $state([
-    { label: "Handle",        field: "username",      type: "text",   value: "" },
-    { label: "Display Name",  field: "display_name",  type: "text",   value: "" },
-    { label: "Status",        field: "status",        type: "text",   value: "" },
-    { label: "Bio",           field: "bio",           type: "text",   value: "" },
-    { label: "Pronouns",      field: "pronouns",      type: "text",   value: "" },
-    { label: "Location",      field: "location",      type: "text",   value: "" },
+    { label: "Handle",        field: "username",      type: "text",   value: "",        placeholder: "your-handle" },
+    { label: "Display Name",  field: "display_name",  type: "text",   value: "",        placeholder: "Alan Turing" },
+    { label: "Status",        field: "status",        type: "text",   value: "",        placeholder: "What you're up to" },
+    { label: "Bio",           field: "bio",           type: "text",   value: "",        placeholder: "short description of who you are" },
+    { label: "Pronouns",      field: "pronouns",      type: "text",   value: "",        placeholder: "they/them" },
+    { label: "Location",      field: "location",      type: "text",   value: "",        placeholder: "The Moon, Space" },
     { label: "Colour",        field: "colour",        type: "color",  value: "#000000" },
     { label: "Accent Colour", field: "accent_colour", type: "color",  value: "#000000" },
   ]);
@@ -90,6 +91,7 @@
           label={input.label}
           type={input.type}
           bind:value={input.value}
+          placeholder={input.placeholder ?? ''}
         />
       {/each}
       <div>

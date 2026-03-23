@@ -3,10 +3,11 @@
         label,
         type = 'text',
         value = $bindable(''),
-    }: { label: string; type?: string; value?: string } = $props();
+        placeholder = '',
+    }: { label: string; type?: string; value?: string; placeholder?: string } = $props();
 </script>
 
 <div>
     <label for="{value}">{label}</label>
-    <input {type} name="{value}" bind:value={value} />
+    <input {type} name="{value}" bind:value={value} {placeholder} />
 </div>
