@@ -97,19 +97,27 @@ func (m model) View() string {
 	}
 
 	// --- Bio / status ---
+	// Status: headline style — italic, accent colour, immediately under name (no label).
+	// Bio: faint paragraph below, separated by whitespace.
+	statusColour := lipgloss.Color("10") // default: bright green
+	if m.user.AccentColour != "" {
+		statusColour = lipgloss.Color(m.user.AccentColour)
+	}
+	statusStyle := r.NewStyle().Italic(true).Foreground(statusColour)
+
 	switch layout {
 	case "minimal":
 		// omit
 	case "compact":
 		if m.user.Status != "" {
-			lines = append(lines, "", m.user.Status)
+			lines = append(lines, statusStyle.Render(m.user.Status))
 		}
 	default: // full
-		if m.user.Bio != "" {
-			lines = append(lines, "", m.user.Bio)
-		}
 		if m.user.Status != "" {
-			lines = append(lines, m.user.Status)
+			lines = append(lines, statusStyle.Render(m.user.Status))
+		}
+		if m.user.Bio != "" {
+			lines = append(lines, "", r.NewStyle().Faint(true).Render(m.user.Bio))
 		}
 	}
 
