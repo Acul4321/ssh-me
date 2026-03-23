@@ -17,6 +17,7 @@ type Profile struct {
 	Pronouns     string `json:"pronouns"`
 	Location     string `json:"location"`
 	Layout       string `json:"layout"`
+	Border       string `json:"border"`
 	AvatarURL    string `json:"avatar_url"`
 }
 

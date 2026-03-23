@@ -167,8 +167,9 @@ func (m model) View() string {
 
 	content := strings.Join(lines, "\n")
 
+	borderStyle := resolveBorder(m.user.Border)
 	bordered := r.NewStyle().
-		Border(lipgloss.ThickBorder()).
+		Border(borderStyle).
 		Padding(1, 2).
 		BorderForeground(lipgloss.Color(m.user.Colour)).
 		Render(content)
@@ -204,6 +205,39 @@ func resolvePlatformColour(link Link, userColour string) lipgloss.TerminalColor 
 		return lipgloss.Color(userColour)
 	}
 	return lipgloss.Color("12") // bright blue fallback
+}
+
+func resolveBorder(border string) lipgloss.Border {
+	switch border {
+	case "rounded":
+		return lipgloss.RoundedBorder()
+	case "normal":
+		return lipgloss.NormalBorder()
+	case "double":
+		return lipgloss.DoubleBorder()
+	case "ascii":
+		return lipgloss.Border{
+			Top: "-", Bottom: "-", Left: "|", Right: "|",
+			TopLeft: "+", TopRight: "+", BottomLeft: "+", BottomRight: "+",
+		}
+	case "hash":
+		return lipgloss.Border{
+			Top: "=", Bottom: "=", Left: "#", Right: "#",
+			TopLeft: "#", TopRight: "#", BottomLeft: "#", BottomRight: "#",
+		}
+	case "block":
+		return lipgloss.Border{
+			Top: "▀", Bottom: "▄", Left: "▌", Right: "▐",
+			TopLeft: "▛", TopRight: "▜", BottomLeft: "▙", BottomRight: "▟",
+		}
+	case "star":
+		return lipgloss.Border{
+			Top: "─", Bottom: "─", Left: "│", Right: "│",
+			TopLeft: "✦", TopRight: "✦", BottomLeft: "✦", BottomRight: "✦",
+		}
+	default: // "thick" or unset
+		return lipgloss.ThickBorder()
+	}
 }
 
 func trimScheme(url string) string {

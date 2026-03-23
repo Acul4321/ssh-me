@@ -39,9 +39,11 @@
   });
 
   let layout = $state('full');
+  let border = $state('thick');
 
   $effect(() => {
     if (auth.user?.layout) layout = auth.user.layout;
+    if (auth.user?.border) border = auth.user.border;
   });
 
   let profileState = $derived({
@@ -50,6 +52,7 @@
       return acc;
     }, {} as Record<string, any>),
     layout,
+    border,
   });
 
   async function update_user_fields() {
@@ -100,6 +103,19 @@
           <option value="full">Full</option>
           <option value="compact">Compact</option>
           <option value="minimal">Minimal</option>
+        </select>
+      </div>
+      <div>
+        <label for="border">Border Style</label>
+        <select id="border" bind:value={border}>
+          <option value="thick">Thick  ┏━┓</option>
+          <option value="rounded">Rounded  ╭─╮</option>
+          <option value="normal">Normal  ┌─┐</option>
+          <option value="double">Double  ╔═╗</option>
+          <option value="ascii">ASCII  +-+</option>
+          <option value="hash">Hash  #=#</option>
+          <option value="block">Block  ▛▀▜</option>
+          <option value="star">Star  ✦─✦</option>
         </select>
       </div>
     </Form>
