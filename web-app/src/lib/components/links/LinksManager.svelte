@@ -1,26 +1,35 @@
 <script lang="ts">
   import { pb } from '../../pocketbase/Pocketbase.ts';
+  import './LinksManager.css';
 
   let { profileId }: { profileId: string } = $props();
 
   const PLATFORMS = [
-    { id: 'github',    label: 'GitHub' },
-    { id: 'linkedin',  label: 'LinkedIn' },
-    { id: 'youtube',   label: 'YouTube' },
-    { id: 'twitter',   label: 'Twitter / X' },
+    { id: 'github', label: 'GitHub' },
+    { id: 'linkedin', label: 'LinkedIn' },
+    { id: 'youtube', label: 'YouTube' },
+    { id: 'twitter', label: 'Twitter / X' },
     { id: 'instagram', label: 'Instagram' },
-    { id: 'mastodon',  label: 'Mastodon' },
-    { id: 'bluesky',   label: 'Bluesky' },
-    { id: 'twitch',    label: 'Twitch' },
-    { id: 'discord',   label: 'Discord' },
-    { id: 'devto',     label: 'Dev.to' },
-    { id: 'hashnode',  label: 'Hashnode' },
-    { id: 'website',   label: 'Website' },
-    { id: 'blog',      label: 'Blog' },
-    { id: 'email',     label: 'Email' },
+    { id: 'mastodon', label: 'Mastodon' },
+    { id: 'bluesky', label: 'Bluesky' },
+    { id: 'twitch', label: 'Twitch' },
+    { id: 'discord', label: 'Discord' },
+    { id: 'devto', label: 'Dev.to' },
+    { id: 'hashnode', label: 'Hashnode' },
+    { id: 'website', label: 'Website' },
+    { id: 'blog', label: 'Blog' },
+    { id: 'email', label: 'Email' },
+    { id: 'custom', label: 'Custom' },
   ];
 
   let links: Record<string, any>[] = $state([]);
+  let newPlatform = $state('github');
+  let newLabel = $state('');
+  let newUrl = $state('');
+  let editingId: string | null = $state(null);
+  let editingPlatform = $state('github');
+  let editingLabel = $state('');
+  let editingUrl = $state('');
 
   $effect(() => {
     if (profileId) loadLinks();
@@ -34,201 +43,141 @@
     links = result.items;
   }
 
-  // Map platform id -> existing link record (or null)
-  let platformLinks = $derived(
-    Object.fromEntries(PLATFORMS.map(p => [p.id, links.find(l => l.platform === p.id) ?? null]))
-  );
-
-  let customLinks = $derived(links.filter(l => l.platform === 'custom'));
-
-  // Platform link editing
-  let editingPlatform: string | null = $state(null);
-  let editingUrl = $state('');
-  let editingLabel = $state('');
-
-  function openPlatformEditor(platformId: string) {
-    const existing = platformLinks[platformId];
-    editingPlatform = platformId;
-    editingUrl = existing?.url ?? '';
-    editingLabel = existing?.label ?? '';
+  function getPlatformLabel(platformId: string) {
+    return PLATFORMS.find((platform) => platform.id === platformId)?.label ?? platformId;
   }
 
-  async function savePlatformLink(platformId: string) {
-    const existing = platformLinks[platformId];
-    const platformLabel = PLATFORMS.find(p => p.id === platformId)?.label ?? platformId;
-    const data = {
-      profile: profileId,
-      platform: platformId,
-      url: editingUrl,
-      label: editingLabel || platformLabel,
-      visible: true,
-      sort_order: existing?.sort_order ?? links.length,
-    };
-    if (existing) {
-      await pb.collection('links').update(existing.id, data);
-    } else {
-      await pb.collection('links').create(data);
+  function resetCreateForm() {
+    newPlatform = 'github';
+    newLabel = '';
+    newUrl = '';
+  }
+
+  async function addLink() {
+    if (!newUrl) return;
+
+    const selectedLabel = newPlatform === 'custom'
+      ? newLabel || 'Custom'
+      : getPlatformLabel(newPlatform);
+
+    if (newPlatform !== 'custom') {
+      const existingLink = links.find((link) => link.platform === newPlatform);
+      if (existingLink) {
+        await pb.collection('links').update(existingLink.id, {
+          label: selectedLabel,
+          url: newUrl,
+          visible: true,
+        });
+        resetCreateForm();
+        await loadLinks();
+        return;
+      }
     }
-    editingPlatform = null;
-    editingUrl = '';
-    editingLabel = '';
-    await loadLinks();
-  }
 
-  async function deletePlatformLink(id: string) {
-    await pb.collection('links').delete(id);
-    await loadLinks();
-  }
-
-  // Custom link editing
-  let showAddCustom = $state(false);
-  let newCustomLabel = $state('');
-  let newCustomUrl = $state('');
-  let editingCustomId: string | null = $state(null);
-  let editingCustomLabel = $state('');
-  let editingCustomUrl = $state('');
-
-  async function addCustomLink() {
-    if (!newCustomUrl) return;
     await pb.collection('links').create({
       profile: profileId,
-      platform: 'custom',
-      label: newCustomLabel,
-      url: newCustomUrl,
+      platform: newPlatform,
+      label: selectedLabel,
+      url: newUrl,
       visible: true,
       sort_order: links.length,
     });
-    newCustomLabel = '';
-    newCustomUrl = '';
-    showAddCustom = false;
+
+    resetCreateForm();
     await loadLinks();
   }
 
-  function openCustomEditor(link: Record<string, any>) {
-    editingCustomId = link.id;
-    editingCustomLabel = link.label;
-    editingCustomUrl = link.url;
+  function startEditing(link: Record<string, any>) {
+    editingId = link.id;
+    editingPlatform = link.platform;
+    editingLabel = link.label ?? getPlatformLabel(link.platform);
+    editingUrl = link.url;
   }
 
-  async function saveCustomLink() {
-    if (!editingCustomId) return;
-    await pb.collection('links').update(editingCustomId, {
-      label: editingCustomLabel,
-      url: editingCustomUrl,
+  async function saveEditing() {
+    if (!editingId || !editingUrl) return;
+
+    await pb.collection('links').update(editingId, {
+      platform: editingPlatform,
+      label: editingPlatform === 'custom'
+        ? editingLabel || 'Custom'
+        : getPlatformLabel(editingPlatform),
+      url: editingUrl,
+      visible: true,
     });
-    editingCustomId = null;
+
+    editingId = null;
+    editingLabel = '';
+    editingUrl = '';
     await loadLinks();
   }
 
-  async function deleteCustomLink(id: string) {
+  async function removeLink(id: string) {
     await pb.collection('links').delete(id);
+    if (editingId === id) editingId = null;
     await loadLinks();
   }
 </script>
 
-<section>
-  <h3>Platform Links</h3>
-  <div class="platform-grid">
-    {#each PLATFORMS as platform}
-      {@const existing = platformLinks[platform.id]}
-      <div class="platform-row">
-        {#if editingPlatform === platform.id}
-          <div class="platform-editor">
-            <strong>{platform.label}</strong>
-            <input type="url" placeholder="URL" bind:value={editingUrl} />
-            <input type="text" placeholder="Custom label (optional)" bind:value={editingLabel} />
-            <button onclick={() => savePlatformLink(platform.id)}>Save</button>
-            <button onclick={() => editingPlatform = null}>Cancel</button>
+<section class="links-panel">
+  <p class="section-label">Links</p>
+
+  {#if links.length}
+    <div class="links-list">
+      {#each links as link (link.id)}
+        {#if editingId === link.id}
+          <form class="link-edit-row" onsubmit={(event) => {
+            event.preventDefault();
+            saveEditing();
+          }}>
+            <select bind:value={editingPlatform}>
+              {#each PLATFORMS as platform}
+                <option value={platform.id}>{platform.label}</option>
+              {/each}
+            </select>
+
+            {#if editingPlatform === 'custom'}
+              <input type="text" placeholder="Custom label" bind:value={editingLabel}>
+            {/if}
+
+            <input type="url" placeholder="https://example.com" bind:value={editingUrl}>
+
+            <div class="link-actions">
+              <button type="submit" class="button-primary">Save</button>
+              <button type="button" class="button-secondary" onclick={() => editingId = null}>Cancel</button>
+            </div>
+          </form>
+        {:else}
+          <div class="link-row">
+            <span class="link-label">{link.label || getPlatformLabel(link.platform)}</span>
+            <a class="link-url" href={link.url} target="_blank" rel="noreferrer">{link.url}</a>
+            <div class="link-actions">
+              <button type="button" class="button-secondary" onclick={() => startEditing(link)}>Edit</button>
+              <button type="button" class="button-secondary" onclick={() => removeLink(link.id)}>Remove</button>
+            </div>
           </div>
-        {:else}
-          <span class="platform-name">{platform.label}</span>
-          {#if existing}
-            <span class="platform-url">{existing.url}</span>
-            <button onclick={() => openPlatformEditor(platform.id)}>Edit</button>
-            <button onclick={() => deletePlatformLink(existing.id)}>Remove</button>
-          {:else}
-            <button onclick={() => openPlatformEditor(platform.id)}>+ Add</button>
-          {/if}
         {/if}
-      </div>
-    {/each}
-  </div>
+      {/each}
+    </div>
+  {:else}
+    <p class="empty-state">No links yet.</p>
+  {/if}
 
-  <h3>Custom Links</h3>
-  <div class="custom-links">
-    {#each customLinks as link}
-      <div class="custom-row">
-        {#if editingCustomId === link.id}
-          <input type="text" placeholder="Label" bind:value={editingCustomLabel} />
-          <input type="url" placeholder="URL" bind:value={editingCustomUrl} />
-          <button onclick={saveCustomLink}>Save</button>
-          <button onclick={() => editingCustomId = null}>Cancel</button>
-        {:else}
-          <span>{link.label || link.url}</span>
-          <span class="platform-url">{link.url}</span>
-          <button onclick={() => openCustomEditor(link)}>Edit</button>
-          <button onclick={() => deleteCustomLink(link.id)}>Remove</button>
-        {/if}
-      </div>
-    {/each}
+  <form class="new-link-form" onsubmit={(event) => {
+    event.preventDefault();
+    addLink();
+  }}>
+    <select bind:value={newPlatform}>
+      {#each PLATFORMS as platform}
+        <option value={platform.id}>{platform.label}</option>
+      {/each}
+    </select>
 
-    {#if showAddCustom}
-      <div class="custom-row">
-        <input type="text" placeholder="Label (e.g. My Blog)" bind:value={newCustomLabel} />
-        <input type="url" placeholder="URL" bind:value={newCustomUrl} />
-        <button onclick={addCustomLink}>Add</button>
-        <button onclick={() => showAddCustom = false}>Cancel</button>
-      </div>
-    {:else}
-      <button onclick={() => showAddCustom = true}>+ Add custom link</button>
+    {#if newPlatform === 'custom'}
+      <input type="text" placeholder="Custom label" bind:value={newLabel}>
     {/if}
-  </div>
+
+    <input type="url" placeholder="https://example.com" bind:value={newUrl}>
+    <button type="submit" class="button-primary">Add</button>
+  </form>
 </section>
-
-<style>
-  section {
-    margin-top: 1.5rem;
-  }
-
-  h3 {
-    margin-bottom: 0.5rem;
-  }
-
-  .platform-grid, .custom-links {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    margin-bottom: 1rem;
-  }
-
-  .platform-row, .custom-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  .platform-name {
-    width: 8rem;
-    font-weight: bold;
-  }
-
-  .platform-url {
-    color: #666;
-    font-size: 0.9em;
-    flex: 1;
-  }
-
-  .platform-editor {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    width: 100%;
-  }
-
-  input {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.9em;
-  }
-</style>

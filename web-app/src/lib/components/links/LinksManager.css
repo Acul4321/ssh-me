@@ -1,0 +1,78 @@
+.links-panel {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid #666;
+}
+
+.section-label,
+.empty-state {
+  margin: 0 0 20px;
+  color: #f2f2f2;
+  line-height: 1.7;
+}
+
+.links-list {
+  border-bottom: 1px solid #555;
+  margin-bottom: 16px;
+}
+
+.link-row,
+.link-edit-row,
+.new-link-form {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr) 180px;
+  gap: 14px;
+  padding: 12px 0;
+  border-top: 1px solid #555;
+  align-items: center;
+}
+
+.link-edit-row,
+.new-link-form {
+  grid-template-columns: 180px minmax(0, 1fr) 120px;
+}
+
+.link-edit-row:has(input[type="text"]),
+.new-link-form:has(input[type="text"]) {
+  grid-template-columns: 180px minmax(140px, 180px) minmax(0, 1fr) 120px;
+}
+
+.link-label,
+.link-url {
+  color: #fff;
+}
+
+.link-url {
+  word-break: break-word;
+  text-decoration: none;
+}
+
+.link-url:hover {
+  text-decoration: underline;
+}
+
+.link-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.button-primary {
+  background: #fff;
+  color: #000;
+}
+
+.button-secondary {
+  background: #000;
+  color: #fff;
+}
+
+@media (max-width: 700px) {
+  .link-row,
+  .link-edit-row,
+  .new-link-form,
+  .link-edit-row:has(input[type="text"]),
+  .new-link-form:has(input[type="text"]) {
+    grid-template-columns: 1fr;
+  }
+}

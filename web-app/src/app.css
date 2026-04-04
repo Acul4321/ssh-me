@@ -1,80 +1,259 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+  color: #fff;
+  background: #000;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+* {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  background: #000;
+  color: #fff;
   min-width: 320px;
   min-height: 100vh;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-.card {
-  padding: 2em;
-}
-
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+h1 {
+  margin: 0 0 14px;
+  font-size: 52px;
+  line-height: 0.92;
+  font-weight: normal;
+}
+
+p {
+  margin: 0 0 28px;
+  max-width: 64ch;
+  color: #f2f2f2;
+  line-height: 1.7;
+}
+
+label {
+  display: block;
+  color: #f0f0f0;
+  font-size: 13px;
+}
+
+input,
+select,
+textarea,
+button {
+  width: 100%;
+  margin-top: 8px;
+  border: 1px solid #777;
+  border-radius: 0;
+  background: #000;
+  color: #fff;
+  font: inherit;
+  padding: 14px;
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+code {
+  font: inherit;
+  color: #fff;
+}
+
+.page-shell {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.shell-card {
+  border: 1px solid #666;
+  border-left: 3px solid #fff;
+  background: #000;
+  padding: 32px;
+}
+
+.top-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  color: #f0f0f0;
+  font-size: 14px;
+}
+
+.profile-form {
+  margin-bottom: 28px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+textarea {
+  min-height: 104px;
+  resize: vertical;
+}
+
+.color-field {
+  margin-top: 8px;
+}
+
+.color-swatch {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 48px;
+  border: 1px solid #777;
+  overflow: hidden;
+}
+
+.color-swatch input[type="color"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.primary-action,
+.copy-command {
+  margin-top: 24px;
+  background: #fff;
+  color: #000;
+  cursor: pointer;
+}
+
+.copy-command {
+  width: auto;
+  margin-top: 0;
+  text-align: left;
+}
+
+.copy-command-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.copy-icon-button {
+  width: auto;
+  margin-top: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  line-height: 1;
+}
+
+.copy-icon-button .bi-copy {
+  display: block;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.text-button {
+  width: auto;
+  margin-top: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid #666;
+  color: #f0f0f0;
+}
+
+.demo-hook {
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid #666;
+  color: #f0f0f0;
+}
+
+.demo-command {
+  display: block;
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid #777;
+  background: #000;
+  color: #fff;
+}
+
+.demo-command-wrap {
+  margin-top: 12px;
+}
+
+.demo-command-wrap .demo-command {
+  margin-top: 0;
+}
+
+@media (max-width: 700px) {
+  .page-shell {
+    padding: 16px;
   }
-  a:hover {
-    color: #747bff;
+
+  .shell-card {
+    padding: 20px;
   }
-  button {
-    background-color: #f9f9f9;
+
+  h1 {
+    font-size: 40px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .top-row,
+  .footer-row,
+  .demo-hook {
+    display: block;
+  }
+
+  .top-row span,
+  .copy-command-wrap,
+  .copy-command,
+  .text-button,
+  .footer-row code,
+  .footer-row span,
+  .demo-hook span {
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .copy-command-wrap {
+    display: flex;
   }
 }

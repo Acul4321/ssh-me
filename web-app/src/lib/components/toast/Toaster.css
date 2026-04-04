@@ -1,0 +1,22 @@
+.toast-stack {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: grid;
+  gap: 12px;
+  width: min(320px, calc(100vw - 48px));
+}
+
+.toast {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid #fff;
+  border-radius: 0;
+  background: #fff;
+  color: #000;
+  font: inherit;
+  line-height: 1.5;
+}
