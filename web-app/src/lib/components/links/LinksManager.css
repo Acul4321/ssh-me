@@ -20,7 +20,7 @@
 .link-edit-row,
 .new-link-form {
   display: grid;
-  grid-template-columns: 140px minmax(0, 1fr) 180px;
+  grid-template-columns: 72px 140px minmax(0, 1fr) 72px;
   gap: 14px;
   padding: 12px 0;
   border-top: 1px solid #555;
@@ -29,17 +29,39 @@
 
 .link-edit-row,
 .new-link-form {
-  grid-template-columns: 180px minmax(0, 1fr) 120px;
-}
-
-.link-edit-row:has(input[type="text"]),
-.new-link-form:has(input[type="text"]) {
-  grid-template-columns: 180px minmax(140px, 180px) minmax(0, 1fr) 120px;
+  grid-template-columns: 1fr;
+  gap: 10px;
 }
 
 .link-label,
 .link-url {
   color: #fff;
+}
+
+.link-order-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.link-order-button {
+  width: auto;
+  margin-top: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  line-height: 1;
+}
+
+.link-order-button:disabled {
+  color: #555;
+  cursor: default;
+}
+
+.link-order-button .bi {
+  display: block;
+  font-size: 16px;
+  line-height: 1;
 }
 
 .link-url {
@@ -52,9 +74,25 @@
 }
 
 .link-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  justify-content: flex-end;
   gap: 10px;
+}
+
+.icon-button {
+  width: auto;
+  margin-top: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  line-height: 1;
+}
+
+.icon-button .bi {
+  display: block;
+  font-size: 16px;
+  line-height: 1;
 }
 
 .button-primary {

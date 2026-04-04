@@ -154,7 +154,8 @@ func (m model) View() string {
 			if urlMaxLen > 3 && len(url) > urlMaxLen {
 				url = url[:urlMaxLen-3] + "..."
 			}
-			lines = append(lines, fmt.Sprintf("▸ %s%s%s", labelStyle.Render(label), padding, urlStyle.Render(url)))
+			clickableURL := r.Output().Hyperlink(link.URL, url)
+			lines = append(lines, fmt.Sprintf("▸ %s%s%s", labelStyle.Render(label), padding, urlStyle.Render(clickableURL)))
 		}
 	}
 
