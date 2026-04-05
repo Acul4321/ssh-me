@@ -23,9 +23,20 @@ import (
 const userCtxKey = "pbProfile"
 
 const (
-	host = "0.0.0.0"
-	port = "22"
+	defaultHost        = "0.0.0.0"
+	defaultPort        = "22"
+	defaultHostKeyPath = ".ssh/id_ed25519"
 )
+
+func firstNonEmpty(values ...string) string {
+	for _, value := range values {
+		if value != "" {
+			return value
+		}
+	}
+
+	return ""
+}
 
 func userLookupMiddleware(next ssh.Handler) ssh.Handler {
 	return func(sess ssh.Session) {
@@ -41,15 +52,20 @@ func userLookupMiddleware(next ssh.Handler) ssh.Handler {
 }
 
 func main() {
-	if os.Getenv("PB_BASE_URL") == "" {
+	pbBaseURL := os.Getenv("PB_BASE_URL")
+	if pbBaseURL == "" {
 		log.Fatal("PB_BASE_URL environment variable not set")
 	}
+
+	host := firstNonEmpty(os.Getenv("SSH_HOST"), defaultHost)
+	port := firstNonEmpty(os.Getenv("SSH_PORT"), os.Getenv("PORT"), defaultPort)
+	hostKeyPath := firstNonEmpty(os.Getenv("SSH_HOST_KEY_PATH"), defaultHostKeyPath)
 
 	lipgloss.SetColorProfile(termenv.TrueColor)
 
 	s, err := wish.NewServer(
 		wish.WithAddress(net.JoinHostPort(host, port)),
-		wish.WithHostKeyPath(".ssh/id_ed25519"),
+		wish.WithHostKeyPath(hostKeyPath),
 		wish.WithMiddleware(
 			bubbletea.Middleware(teaHandler),
 			activeterm.Middleware(),
@@ -63,7 +79,7 @@ func main() {
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	log.Info("Starting SSH server", "host", host, "port", port)
+	log.Info("Starting SSH server", "host", host, "port", port, "pb_base_url", pbBaseURL, "host_key_path", hostKeyPath)
 	go func() {
 		if err = s.ListenAndServe(); err != nil && !errors.Is(err, ssh.ErrServerClosed) {
 			log.Error("Could not start server", "error", err)
