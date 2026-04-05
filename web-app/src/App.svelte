@@ -54,6 +54,7 @@
 
   let sshLine = $derived(auth.user?.username ? `ssh ${auth.user.username}@ssh-me.com` : 'ssh your-handle@ssh-me.com');
   const demoSshLine = 'ssh demo@ssh-me.com';
+  const repoUrl = 'https://github.com/Acul4321/ssh-me';
 
   async function updateUserFields() {
     const profileId = auth.user?.id;
@@ -124,7 +125,22 @@
           {/each}
 
           <label>
-            Layout
+            <span class="field-label-row">
+              <span>Layout</span>
+              <span class="tooltip-wrap">
+                <button
+                  type="button"
+                  class="tooltip-trigger"
+                  aria-describedby="layout-tooltip"
+                  aria-label="Explain layout types"
+                >
+                  <i class="bi bi-info-circle" aria-hidden="true"></i>
+                </button>
+                <span id="layout-tooltip" role="tooltip" class="tooltip-popup">
+                  Full shows everything. Compact shows name, status, and links. Minimal shows name and links only.
+                </span>
+              </span>
+            </span>
             <select bind:value={layout}>
               <option value="full">full</option>
               <option value="compact">compact</option>
@@ -193,3 +209,13 @@
     {/if}
   </section>
 </main>
+
+<a
+  class="repo-link"
+  href={repoUrl}
+  target="_blank"
+  rel="noreferrer"
+  aria-label="View the ssh-me GitHub repository"
+>
+  <i class="bi bi-github" aria-hidden="true"></i>
+</a>

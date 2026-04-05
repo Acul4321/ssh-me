@@ -48,6 +48,57 @@ label {
   font-size: 13px;
 }
 
+.field-label-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tooltip-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tooltip-trigger {
+  width: auto;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #fff;
+  line-height: 1;
+  cursor: help;
+}
+
+.tooltip-trigger .bi {
+  display: block;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.tooltip-popup {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 10px);
+  z-index: 20;
+  display: none;
+  width: 240px;
+  padding: 10px 12px;
+  transform: translateY(-50%);
+  border: 1px solid #fff;
+  background: #fff;
+  color: #000;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.tooltip-wrap:hover .tooltip-popup,
+.tooltip-trigger:focus-visible + .tooltip-popup,
+.tooltip-popup:hover {
+  display: block;
+}
+
 input,
 select,
 textarea,
@@ -219,6 +270,34 @@ textarea {
   margin-top: 0;
 }
 
+.repo-link {
+  position: fixed;
+  left: 24px;
+  bottom: 24px;
+  z-index: 30;
+  color: #fff;
+  line-height: 1;
+  text-decoration: none;
+  transition: color 120ms ease;
+}
+
+.repo-link .bi-github {
+  display: block;
+  font-size: 48px;
+  line-height: 1;
+}
+
+.repo-link:hover,
+.repo-link:focus-visible {
+  color: #bdbdbd;
+}
+
+@media (max-width: 900px) {
+  .repo-link {
+    display: none;
+  }
+}
+
 @media (max-width: 700px) {
   .page-shell {
     padding: 16px;
@@ -255,5 +334,10 @@ textarea {
 
   .copy-command-wrap {
     display: flex;
+  }
+
+  .repo-link {
+    left: 16px;
+    bottom: 16px;
   }
 }
